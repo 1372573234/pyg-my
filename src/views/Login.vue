@@ -1,17 +1,17 @@
 <template>
 <el-row type="flex" class="row-bg" justify="center" align="middle" >
   <el-col :xs="14" :sm="12" :md="10" :lg="8" :xl="6">
-    <el-form ref="form" :model="form" class="el-form" label-width="80px" label-position="top" >
-      <el-form-item label="用户名">
-        <el-input v-model="form.name"></el-input>
+    <el-form ref="ruleForm" :model="form" :rules="rules" class="el-form" label-width="80px" label-position="top" >
+      <el-form-item label="用户名" prop="username">
+        <el-input v-model="form.username"></el-input>
       </el-form-item>
-      <el-form-item label="密码">
-        <el-input v-model="form.name"></el-input>
+      <el-form-item label="密码" prop="password">
+        <el-input type="password" v-model="form.password"></el-input>
       </el-form-item>
       
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">登录</el-button>
-        <el-button>重置</el-button>
+        <el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
+        <el-button @click="resetForm('ruleForm')">重置</el-button>
       </el-form-item>
     </el-form>
   </el-col>
@@ -24,24 +24,48 @@
 </template>
 
 <script>
+import axios from "axios"
  export default {
     data() {
       return {
         form: {
-          name: '',
-          region: '',
-          date1: '',
-          date2: '',
-          delivery: false,
-          type: [],
-          resource: '',
-          desc: ''
+          username:"",
+          password:""
+        },
+        rules:{
+          username:[
+            { required: true, message: '请输入用户名', trigger: 'blur' },
+            { min: 5, max: 12, message: '长度在 5 到 12 个字符', trigger: 'blur' }
+          ],
+          password:[
+            { required: true, message: '请输入密码', trigger: 'blur' },
+            { min: 6, max: 12, message: '长度在 6 到 12 个字符', trigger: 'blur' }
+          ]
         }
       }
     },
     methods: {
-      onSubmit() {
-        console.log('submit!');
+      submitForm(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            axios({
+              url:"http://localhost:8888/api/private/v1/login",
+              method:"post",
+              data:this.form
+            }).then(({data:{data,meta}}) => {
+              // console.log(meta,data);
+              if( meta.status === 200){
+                this.$router.push('/home')
+              }
+            })
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+      },
+      resetForm(formName) {
+        this.$refs[formName].resetFields();
       }
     }
   }
