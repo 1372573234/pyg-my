@@ -29,8 +29,8 @@ import axios from "axios"
     data() {
       return {
         form: {
-          username:"",
-          password:""
+          username:"admin",
+          password:"123456 "
         },
         rules:{
           username:[
@@ -55,6 +55,8 @@ import axios from "axios"
             }).then(({data:{data,meta}}) => {
               // console.log(meta,data);
               if( meta.status === 200){
+                console.log(data);
+                localStorage.setItem("token",data.token)
                 this.$router.push('/home')
               }
             })
