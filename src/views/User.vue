@@ -1,5 +1,13 @@
  <template>
-  <el-table
+  <div>
+    <el-breadcrumb separator-class="el-icon-arrow-right">
+      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item>活动管理</el-breadcrumb-item>
+      <el-breadcrumb-item>活动列表</el-breadcrumb-item>
+      <el-breadcrumb-item>活动详情</el-breadcrumb-item>
+    </el-breadcrumb>
+
+    <el-table
     :data="dataList"
     stripe
     style="width: 100%">
@@ -24,9 +32,10 @@
       <!-- <template v-slot="scope">    -->
         <!-- {{ scope.row}} -->
         <el-switch 
-          v-model="row.type"
+          v-model="row.mg_state"
           active-color="#13ce66"
-          inactive-color="#ff4949">
+          inactive-color="#ff4949"
+          @change="changeStatus(row)">
         </el-switch>
       </template>
     </el-table-column>
@@ -37,34 +46,78 @@
       <el-button type="danger" plain size="mini" icon="el-icon-delete"></el-button>
       <el-button type="success" plain size="mini" icon="el-icon-check">分配角色</el-button>
     </el-table-column>
+
+  
+
   </el-table>
+   <el-pagination
+    background
+    layout="prev, pager, next"
+    :total="total"
+    :page-size="pagesize"
+    :current-page="currentpage"
+    @current-change="changePage"
+   >
+  </el-pagination>
+ </div>  
 </template>
 
 <script>
   import axios from "axios"
-import Vue from 'vue';
+  import Vue from 'vue';
   export default {
     data() {
       return {
-        dataList:[]
+        dataList:[],
+        total: 0,
+        pagesize: 3,
+        currentpage: 1,
       }
     },
     created(){
-      axios({
-        url:"http://localhost:8888/api/private/v1/users",
-        params:{
-          pagenum:1,
-          pagesize:5
-        },
-        headers:{
-          Authorization:localStorage.getItem("token")
+      this.getDataList();
+    },
+    methods:{
+      getDataList(){
+        axios({
+          url:"http://localhost:8888/api/private/v1/users",
+          params:{
+            pagenum:this.currentpage,
+            pagesize:this.pagesize
+          },
+          headers:{
+            Authorization:localStorage.getItem("token")
+          }
+
+        }).then(res => {
+          let {data:{data,meta}} = res;
+          this.dataList = data.users;
+          this.total = data.total;
+        
+        console.log(res.data);
+        })
+      },
+      async changeStatus(user){
+        let res = await axios({
+          url:`http://localhost:8888/api/private/v1/users/${user.id}/state/${user.mg_state}`,
+          method:"put",
+          headers:{
+            Authorization:localStorage.getItem("token")
+          }
+        })
+        if(res.data.meta.status == 200){
+          this.$message({
+            type:"success",
+            message: '修改状态成功',
+            duration:1000
+          })
         }
-
-      }).then(res => {
-      this.dataList = res.data.data.users
-      console.log(res.data);
-      })
-
+        
+      },
+      changePage(currentpage){
+        this.currentpage = currentpage;
+        this.getDataList()
+      }
     }
   }
 

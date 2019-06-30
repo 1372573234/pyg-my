@@ -1,7 +1,7 @@
 <template>
 <el-row type="flex" class="row-bg" justify="center" align="middle" >
   <el-col :xs="14" :sm="12" :md="10" :lg="8" :xl="6">
-    <el-form ref="ruleForm" :model="form" :rules="rules" class="el-form" label-width="80px" label-position="top" >
+    <el-form ref="ruleForm" :model="form" :rules="rules" class="el-form" label-width="80px" label-position="top"  >
       <el-form-item label="用户名" prop="username">
         <el-input v-model="form.username"></el-input>
       </el-form-item>
@@ -79,10 +79,9 @@ import axios from "axios"
   background-color: #2D434C;
 }
 .el-form{
-  background-color: #fff;
-  min-width: 400px;
-  border-radius: 10px;
-  border: 1px solid #000;
-  padding: 20px 20px;
+   background-color: #fff;
+    border-radius: 10px;
+    padding: 30px 20px;
+    min-width: 400px;
 }
 </style>
