@@ -6,9 +6,9 @@ import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
 import "./assets/css/index.css";
 
-Vue.use(ElementUI);
+import axios from "axios";
 
-Vue.config.productionTip = false;
+Vue.use(ElementUI);
 
 router.beforeEach((to, from, next) => {
   // eslint-disable-next-line no-console
@@ -25,6 +25,16 @@ router.beforeEach((to, from, next) => {
 
   // console.log(to, from);
 });
+
+axios.defaults.baseURL = "http://localhost:8888/api/private/v1/";
+
+axios.interceptors.request.use(function(config) {
+  config.headers.Authorization = localStorage.getItem("token");
+  return config;
+});
+
+Vue.prototype.$http = axios;
+Vue.config.productionTip = false;
 
 new Vue({
   router,

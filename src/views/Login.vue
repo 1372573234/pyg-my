@@ -1,12 +1,12 @@
 <template>
 <el-row type="flex" class="row-bg" justify="center" align="middle" >
   <el-col :xs="14" :sm="12" :md="10" :lg="8" :xl="6">
-    <el-form ref="ruleForm" :model="form" :rules="rules" class="el-form" label-width="80px" label-position="top"  >
+    <el-form ref="ruleForm" :model="form" :rules="rules" class="el-form" label-width="80px"   >
       <el-form-item label="用户名" prop="username">
-        <el-input v-model="form.username"></el-input>
+        <el-input v-model="form.username" autocomplete="off"></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="password">
-        <el-input type="password" v-model="form.password"></el-input>
+        <el-input type="password" show-password v-model="form.password" autocomplete="off"></el-input>
       </el-form-item>
       
       <el-form-item>
@@ -29,8 +29,8 @@ import axios from "axios"
     data() {
       return {
         form: {
-          username:"admin",
-          password:"123456 "
+          username:"",
+          password:""
         },
         rules:{
           username:[
@@ -79,9 +79,9 @@ import axios from "axios"
   background-color: #2D434C;
 }
 .el-form{
-   background-color: #fff;
-    border-radius: 10px;
-    padding: 30px 20px;
-    min-width: 400px;
+  background-color: #fff;
+  border-radius: 10px;
+  padding:  50px 30px 10px 0px;
+  min-width: 400px;
 }
 </style>

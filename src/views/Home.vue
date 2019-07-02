@@ -9,7 +9,7 @@
           <h1>品优购后台管理系统</h1>
         </el-col>
         <el-col :span="6">
-          <p>欢迎39期星耀<a>退出</a></p>
+          <p>欢迎39期星耀<a @click="logout" style="cursor: pointer;">退出</a></p>
         </el-col>
       </el-row>
     </el-header>
@@ -44,11 +44,11 @@
                   <i class="el-icon-location"></i>
                   <span>权限管理</span>
                 </template> 
-                <el-menu-item index="4">
+                <el-menu-item index="/roles">
                   <i class="el-icon-menu"></i>
                   <span slot="title">角色列表</span>
                 </el-menu-item>
-                <el-menu-item index="4">
+                <el-menu-item index="/rights">
                 <i class="el-icon-menu"></i>
                 <span slot="title">权限列表</span>
               </el-menu-item>
@@ -114,7 +114,13 @@
 <script>
 
   export default {
-  
+    methods:{
+      logout(){
+        localStorage.removeItem("token")
+        this.$router.push("/login");
+         
+      }
+    }
   }
 </script>
 

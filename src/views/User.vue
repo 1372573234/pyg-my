@@ -6,7 +6,7 @@
       <el-breadcrumb-item>用户列表</el-breadcrumb-item>
     </el-breadcrumb>
 
-    <el-row :gutter="10">
+    <el-row >
       <el-col :span="6">
          <div style="margin-top: 15px;"  >
           <el-input placeholder="请输入内容"  class="input-with-select" v-model="keyword" @keyup.enter.native="searchUser" >
@@ -15,7 +15,7 @@
         </div>
       </el-col>
       <el-col :span="6">
-        <el-tag type="success" style="margin-top: 15px;" @click="dialogFormVisible = true">添加用户</el-tag>
+        <el-button plain type="success" style="margin-top: 15px; cursor:pointer;" @click="dialogFormVisible = true">添加用户</el-button>
       </el-col>
     </el-row>
 
@@ -57,7 +57,7 @@
       prop="operate"
       label="操作">
       <template v-slot="{row}">
-        <el-button type="primary" plain size="mini" icon="el-icon-edit"></el-button>
+        <el-button type="primary" plain size="mini" icon="el-icon-edit" @click="editUser(row.id)"></el-button>
         <el-button type="danger" plain size="mini" icon="el-icon-delete" @click="delUser(row.id)"></el-button>
         <el-button type="success" plain size="mini" icon="el-icon-check">分配角色</el-button>
       </template>
@@ -72,16 +72,17 @@
       :page-size="pagesize"
       :current-page="currentpage"
       @current-change="changePage"
+      style="margin-top:10px"
     >
     </el-pagination>
 
-    <el-dialog title="添加用户" :visible.sync="dialogFormVisible">
+    <el-dialog title="添加用户"  :visible.sync="dialogFormVisible">
       <el-form :model="addForm" ref="addForm" :rules="addRules" label-width="80px">
         <el-form-item label="用户名"  prop="username">
           <el-input v-model="addForm.username" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="密码"  prop="password">
-          <el-input v-model="addForm.password" autocomplete="off"></el-input>
+          <el-input v-model="addForm.password" autocomplete="off" type="password" show-password></el-input>
         </el-form-item>
         <el-form-item label="邮箱"  prop="email">
           <el-input v-model="addForm.email" autocomplete="off"></el-input>
@@ -97,13 +98,10 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="修改用户" :visible.sync="dialogFormVisible">
-    <el-form :model="editForm" ref="editForm" :rules="addRules" label-width="80px">
+    <el-dialog title="修改用户" :visible.sync="editDialogFormVisible">
+    <el-form :model="editForm" ref="editForm" :rules="editRules" label-width="80px">
       <el-form-item label="用户名"  prop="username">
-        <el-input v-model="editForm.username" autocomplete="off"></el-input>
-      </el-form-item>
-      <el-form-item label="密码"  prop="password">
-        <el-input v-model="editForm.password" autocomplete="off"></el-input>
+       <el-tag type="info" v-text="editForm.username"></el-tag>
       </el-form-item>
       <el-form-item label="邮箱"  prop="email">
         <el-input v-model="editForm.email" autocomplete="off"></el-input>
@@ -115,7 +113,7 @@
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button @click="dialogFormVisible = false">取 消</el-button>
-      <el-button type="primary" @click="addUser('addForm')">确 定</el-button>
+      <el-button type="primary" @click="editUserForm('editForm')">确 定</el-button>
     </div>
   </el-dialog>
 
@@ -135,12 +133,12 @@
         currentpage: 1,
         keyword:"",
         dialogFormVisible: false,
+        editDialogFormVisible:false,
         addForm: {
           username: '',
           password: '',
           email: '',
           mobile: '',
-         
         },
        formLabelWidth: '120px',
         addRules:{
@@ -152,6 +150,28 @@
             { required: true, message: '请输入用户密码', trigger: 'blur' },
             { min: 6, max: 12, message: '长度在 6 到 12 个字符', trigger: 'blur' }
           ]
+        },
+        editForm:{
+          id:"",
+          username:"",
+          email:"",
+          mobile:""
+        },
+        editRules:{
+          email:[
+            {
+              pattern:/\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/,
+              message:"邮箱格式不正确",
+              trigger:"change"
+            }   
+          ],
+          mobile:[
+            {
+              pattern:/^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/,
+              message:"手机号码格式不正确",
+              trigger:"change"
+            }   
+          ]
         }
       
       }
@@ -160,8 +180,8 @@
       this.getDataList();
     },
     methods:{
-      getDataList(){
-        axios({
+      async getDataList(){
+        let res = await axios({
           url:"http://localhost:8888/api/private/v1/users",
           params:{
             query:this.keyword,
@@ -171,14 +191,12 @@
           headers:{
             Authorization:localStorage.getItem("token")
           }
-
-        }).then(res => {
-          let {data:{data,meta}} = res;
-          this.dataList = data.users;
-          this.total = data.total;
-        
-        // console.log(res.data);
         })
+        console.log(res);
+        let {data:{data,meta}} = res;
+        this.dataList = data.users;
+        this.total = data.total;
+        
       },
       async changeStatus(user){
         let res = await axios({
@@ -207,12 +225,12 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-            axios({
-          url:`http://localhost:8888/api/private/v1/users/${id}`,
-          method:"delete",
-          headers:{
-            Authorization:localStorage.getItem("token")
-          }
+          axios({
+            url:`http://localhost:8888/api/private/v1/users/${id}`,
+            method:"delete",
+            headers:{
+              Authorization:localStorage.getItem("token")
+            }
           }).then(res => {
             if(res.data.meta.status == 200){
               this.$message({
@@ -233,34 +251,81 @@
       searchUser(){
         this.getDataList()
       },
-      addUser(){
-        this.$refs.addForm.validate((valid) => {
-          if (valid) {
-            axios({
+      async addUser(){
+        try {
+           this.$refs.addForm.validate()
+          
+            let res = await axios({
               url:"http://localhost:8888/api/private/v1/users",
               method:"post",
               data:this.addForm,
               headers:{
                 Authorization:localStorage.getItem("token")
               }
-            }).then(res => {
-              if(res.data.meta.status == 201){
-                this.$message({
-                  type:"success",
-                  message:"用户添加成功",
-                  duration:1000
-                })
-                this.dialogFormVisible = false;
-                this.getDataList()
-              }
             })
+            if(res.data.meta.status == 201){
+              this.$message({
+                type:"success",
+                message:res.data.meta.msg,
+                duration:1000
+              })
+              this.dialogFormVisible = false;
+              this.getDataList()
+            }
+          
         
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
-        });
+        } catch (error) {
+           this.$message({
+              type:"error",
+              message:res.data.meta.msg,
+              duration:1000
+            })
+        }
        
+       
+      },
+      async editUser(id){
+        this.editDialogFormVisible = true;
+        let res = await axios({
+          url:`http://localhost:8888/api/private/v1/users/${id}`,
+          method:"get",
+          headers:{
+            Authorization:localStorage.getItem("token")
+          }
+        })
+        this.editForm = res.data.data
+      },
+      async editUserForm(){
+        try {
+          await this.$refs.editForm.validate()
+          let res = await axios({
+            url:`http://localhost:8888/api/private/v1/users/${this.editForm.id}`,
+            method:"put",
+            data:{
+              email:this.editForm.email,
+              mobile:this.editForm.mobile
+            },
+            headers:{
+              Authorization:localStorage.getItem("token")
+            }
+          })
+          if(res.data.meta.status == 200){
+            this.$message({
+              type:"success",
+              message:res.data.meta.msg,
+              duration:1000
+            })
+            this.editDialogFormVisible = false;
+            this.getDataList()
+          }
+          
+        } catch (error) {
+          this.$message({
+              type:"error",
+              message:res.data.meta.msg,
+              duration:1000
+            })
+        }
       }
     }
   }
