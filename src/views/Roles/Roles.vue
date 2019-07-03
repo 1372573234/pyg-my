@@ -134,21 +134,22 @@ export default {
        console.log(res);
        this.rightsList = res.data.data;
 
-        let level1Ids = [];
-        let level2Ids = [];
+        // let level1Ids = [];
+        // let level2Ids = [];
         let level3Ids = [];
 
         row.children.forEach(level1 => {
-          level1Ids.push(level1.id)
+          // level1Ids.push(level1.id)
           level1.children.forEach(level2 => {
-            level2Ids.push(level2.id);
+            // level2Ids.push(level2.id);
             level2.children.forEach(level3 => {
               level3Ids.push(level3.id)
             })
           })
         })
 
-        this.checkRights = [...level1Ids,...level2Ids,...level3Ids]
+        // this.checkRights = [...level1Ids,...level2Ids,...level3Ids]
+        this.checkRights = [...level3Ids]
 
      },
      async updateRole(){
@@ -172,33 +173,54 @@ export default {
        this.dialogFormVisible = false
      },
      async deleteRight(row,id){
-       let level1Ids = [];
-        let level2Ids = [];
-        let level3Ids = [];
+      //  let level1Ids = [];
+      //   let level2Ids = [];
+      //   let level3Ids = [];
 
-        row.children.forEach(level1 => {
-        level1Ids.push(level1.id)
-        level1.children.forEach(level2 => {
-          level2Ids.push(level2.id);
-          level2.children.forEach(level3 => {
-            level3Ids.push(level3.id)
-          })
+      //   row.children.forEach(level1 => {
+      //   level1Ids.push(level1.id)
+      //   level1.children.forEach(level2 => {
+      //     level2Ids.push(level2.id);
+      //     level2.children.forEach(level3 => {
+      //       level3Ids.push(level3.id)
+      //     })
+      //   })
+      // })
+      // let result = [...level1Ids,...level2Ids,...level3Ids];
+      // let ids = result.filter( v => v != id).join();
+      // let res = await this.$http({
+      //   url:`roles/${row.id}/rights`,
+      //   method:"post",
+      //   data:{
+      //     rids:ids
+      //   }
+      // })
+      // this.$message({
+      //   type:"success",
+      //   message:res.data.meta.msg,
+      //   duration:1000
+      // })
+
+      let res = await this.$http({
+        url:`roles/${row.id}/rights/${id}`,
+        method:"delete",
+      })
+      if(res.data.meta.status == 200){
+         this.$message({
+          type:"success",
+          message:res.data.meta.msg,
+          duration:1000
+        })
+      
+      this.getRolesData(() => {
+        this.$nextTick(() => {
+          this.$refs.rightTree.toggleRowExpansion(this.tableData.find(v => v.id == row.id),true);
         })
       })
-      let result = [...level1Ids,...level2Ids,...level3Ids];
-      let ids = result.filter( v => v != id).join();
-      let res = await this.$http({
-        url:`roles/${row.id}/rights`,
-        method:"post",
-        data:{
-          rids:ids
-        }
-      })
-      this.$message({
-        type:"success",
-        message:res.data.meta.msg,
-        duration:1000
-      })
+
+      }
+
+
      }
     }
 }

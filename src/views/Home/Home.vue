@@ -3,7 +3,7 @@
     <el-header>
       <el-row type="flex" class="row-bg" justify="center" align="middle">
         <el-col :span="6">
-          <img src="../assets/logo.png"/>
+          <img src="../../assets/logo.png"/>
         </el-col>
         <el-col>
           <h1>品优购后台管理系统</h1>
@@ -29,17 +29,18 @@
             :unique-opened="true"
             :router="true"
             active-text-color="#ffd04b">
-            <el-submenu index="1">
-                <template slot="title">
-                  <i class="el-icon-location"></i>
-                  <span>用户管理</span>
-                </template> 
-                <el-menu-item index="/user">
-                  <i class="el-icon-menu"></i>
-                  <span slot="title">用户管理</span>
-                </el-menu-item>
-              </el-submenu>
-               <el-submenu index="3">
+            <el-submenu v-for="item1 in menuData" :key="item1.id" :index="item1.id+''" >
+              <template slot="title">
+                <i class="el-icon-location"></i>
+                <span>{{item1.authName}}</span>
+              </template> 
+              <el-menu-item v-for="item2 in item1.children" :index="'/'+item2.path" :key="item2.id">
+                <i class="el-icon-menu"></i>
+                <span slot="title">{{item2.authName}}</span>
+              </el-menu-item>
+            </el-submenu>
+
+               <!-- <el-submenu index="3">
                 <template slot="title">
                   <i class="el-icon-location"></i>
                   <span>权限管理</span>
@@ -90,7 +91,7 @@
               <i class="el-icon-menu"></i>
               <span slot="title">数据报表</span>
             </el-menu-item>
-          </el-submenu>
+          </el-submenu> -->
 
             </el-menu>
         
@@ -114,12 +115,27 @@
 <script>
 
   export default {
+    data(){
+      return {
+        menuData:[]
+      }
+    },
     methods:{
       logout(){
         localStorage.removeItem("token")
-        this.$router.push("/login");
-         
+        this.$router.push("/login"); 
+      },
+      async getMenu(){
+        let res = await this.$http({
+          url:"menus"
+        })
+        console.log(res);
+        this.menuData = res.data.data;
+        console.log(this.menuData);
       }
+    },
+    created(){
+      this.getMenu()
     }
   }
 </script>
