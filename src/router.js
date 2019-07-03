@@ -5,6 +5,7 @@ import Home from "./views/Home/Home.vue";
 import User from "./views/User/User.vue";
 import Roles from "./views/Roles/Roles.vue";
 import Rights from "./views/Rights/Rights.vue";
+import Goods from "./views/Goods/Goods.vue";
 
 Vue.use(Router);
 
@@ -35,6 +36,10 @@ export default new Router({
         {
           path: "/rights",
           component: Rights
+        },
+        {
+          path: "/goods",
+          component: Goods
         }
       ]
     }
