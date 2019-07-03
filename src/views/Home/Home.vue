@@ -3,7 +3,7 @@
     <el-header>
       <el-row type="flex" class="row-bg" justify="center" align="middle">
         <el-col :span="6">
-          <img src="../assets/logo.png"/>
+          <img src="../../assets/logo.png"/>
         </el-col>
         <el-col>
           <h1>品优购后台管理系统</h1>
