@@ -59,7 +59,7 @@
       <template v-slot="{row}">
         <el-button type="primary" plain size="mini" icon="el-icon-edit" @click="editUser(row.id)"></el-button>
         <el-button type="danger" plain size="mini" icon="el-icon-delete" @click="delUser(row.id)"></el-button>
-        <el-button type="success" plain size="mini" icon="el-icon-check">分配角色</el-button>
+        <el-button type="success" plain size="mini" icon="el-icon-check" @click ="assignRoles(row)">分配角色</el-button>
       </template>
      
     </el-table-column>
@@ -75,7 +75,7 @@
       style="margin-top:10px"
     >
     </el-pagination>
-
+    <!-- 添加用户的模态框 -->
     <el-dialog title="添加用户"  :visible.sync="dialogFormVisible">
       <el-form :model="addForm" ref="addForm" :rules="addRules" label-width="80px">
         <el-form-item label="用户名"  prop="username">
@@ -97,7 +97,7 @@
         <el-button type="primary" @click="addUser('addForm')">确 定</el-button>
       </div>
     </el-dialog>
-
+    <!-- 修改用户的模态框 -->
     <el-dialog title="修改用户" :visible.sync="editDialogFormVisible">
     <el-form :model="editForm" ref="editForm" :rules="editRules" label-width="80px">
       <el-form-item label="用户名"  prop="username">
@@ -117,6 +117,25 @@
     </div>
   </el-dialog>
 
+  <!-- 分配角色的模态框 -->
+  <el-dialog title="分配角色" :visible.sync="assignDialogFormVisible">
+  <el-form :model="assignRoleData">
+    <el-form-item label="用户名" :label-width="formLabelWidth">
+      <el-tag type="info" v-text="assignRoleData.username" >标签三</el-tag>
+    </el-form-item>
+    <el-form-item label="角色" :label-width="formLabelWidth">
+      <el-select v-model="assignRoleData.rid" placeholder="请选择活动角色">
+        <el-option v-for="item in roleList" :value="item.id" :key="item.id" :label="item.roleName">
+        </el-option>
+      </el-select>
+    </el-form-item>
+  </el-form>
+  <div slot="footer" class="dialog-footer">
+    <el-button @click="dialogFormVisible = false">取 消</el-button>
+    <el-button type="primary" @click="updateRole">确 定</el-button>
+  </div>
+</el-dialog>
+
 
  </div>  
 </template>
@@ -127,6 +146,13 @@
   export default {
     data() {
       return {
+        roleList:[],
+        assignRoleData:{
+          username:"",
+          rid:""
+        },
+        assignDialogFormVisible:false,
+
         dataList:[],
         total: 0,
         pagesize: 3,
@@ -326,6 +352,34 @@
               duration:1000
             })
         }
+      },
+      async assignRoles(row){
+        this.assignDialogFormVisible = true;
+        let res = await this.$http({
+          url:`users/${row.id}`,
+        });
+        // console.log(res);
+        this.assignRoleData = res.data.data;
+        let roleResult = await this.$http({
+          url:"roles"
+        })
+        this.roleList = roleResult.data.data;
+      },
+      async updateRole(){
+        let res = await this.$http({
+          url:`users/${this.assignRoleData.id}/role`,
+          method:"put",
+          data:{
+            rid:this.assignRoleData.rid
+          }
+        })
+        console.log(res);
+        this.$message({
+          type:"success",
+          message:res.data.meta.msg,
+          duration:1000
+        });
+        this.assignDialogFormVisible = false;
       }
     }
   }

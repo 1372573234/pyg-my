@@ -17,18 +17,21 @@
       width="50">
     </el-table-column>
     <el-table-column
-      prop="date"
+      prop="authName"
       label="权限名称"
-      width="180">
+      width="120">
     </el-table-column>
     <el-table-column
-      prop="name"
+      prop="path"
       label="路径"
-      width="180">
+      width="120">
     </el-table-column>
     <el-table-column
-      prop="address"
+      prop="level"
       label="层级">
+      <template v-slot="{row}">
+        <span>{{ row.level | filter }}</span>
+      </template>
     </el-table-column>
   </el-table>
   </div>
@@ -37,25 +40,33 @@
 
 <script>
   export default {
+    filters:{
+      filter(value){
+        switch(value){
+          case "0":
+            return "一级";
+          case "1":
+            return "二级";
+          case "2":
+            return "三级";
+        }
+      }
+    },
     data() {
       return {
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1517 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1516 弄'
-        }]
+        tableData: []
+      }
+    },
+    created(){
+      this.getRightsData()
+    },
+    methods:{
+      async getRightsData(){
+        let res = await this.$http({
+          url:"rights/list"
+        })
+        console.log(res);
+        this.tableData = res.data.data;
       }
     }
   }
