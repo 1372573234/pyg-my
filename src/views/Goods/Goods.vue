@@ -6,7 +6,7 @@
         <el-breadcrumb-item>商品列表</el-breadcrumb-item>
     </el-breadcrumb>
 
-    <el-button type="success" plain >添加商品</el-button>
+    <el-button type="success" plain @click="addProduction" >添加商品</el-button>
 
     <el-table
     ref="singleTable"
@@ -38,7 +38,7 @@
      >
     </el-table-column>
     <el-table-column
-      property="name"
+      property="operate"
       label="操作"
       >
        <template v-slot="{row}">
@@ -93,6 +93,9 @@
         this.getGoodsData()
 
       },
+      addProduction(){
+        this.$router.push("/goods-add")
+      }
       
     }
  }
