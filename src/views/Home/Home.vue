@@ -129,9 +129,9 @@
         let res = await this.$http({
           url:"menus"
         })
-        console.log(res);
+        // console.log(res);
         this.menuData = res.data.data;
-        console.log(this.menuData);
+        // console.log(this.menuData);
       }
     },
     created(){

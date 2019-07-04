@@ -36,6 +36,9 @@ axios.interceptors.request.use(function(config) {
 Vue.prototype.$http = axios;
 Vue.config.productionTip = false;
 
+var ElTreeGrid = require("element-tree-grid");
+Vue.component(ElTreeGrid.name, ElTreeGrid);
+
 new Vue({
   router,
   render: h => h(App)
