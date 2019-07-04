@@ -11,8 +11,9 @@
     <el-table
     ref="singleTable"
     :data="goodsData"
+    stripe
     highlight-current-row
-    style="width: 100%">
+    style="width: 100%; margin-bottom:10px;">
     <el-table-column
       type="index"
       width="50">
@@ -20,7 +21,7 @@
     <el-table-column
       property="goods_name"
       label="商品名称"
-      width="120">
+      width="180">
     </el-table-column>
     <el-table-column
       property="goods_price"
@@ -39,14 +40,21 @@
     <el-table-column
       property="name"
       label="操作"
-      width="120">
+      >
+       <template v-slot="{row}">
+        <el-button type="primary" plain size="mini" icon="el-icon-edit"></el-button>
+        <el-button type="danger" icon="el-icon-delete" size="mini" plain></el-button>
+      </template>
     </el-table-column>
   </el-table>
   
   <el-pagination
     background
     layout="prev, pager, next"
-    :total="total">
+    :total="total"
+    :current-page="currentpage"
+    :page-size="pagesize"
+    @current-change="currentChange">
   </el-pagination>
 
   </div>
@@ -58,9 +66,10 @@
       return {
         goodsData: [],
         pagenum:1,
-        pagesize:5,
+        pagesize:6,
         currentRow: null,
-        total:0
+        total:0,
+        currentpage:1
       }
     },
     created(){
@@ -71,7 +80,7 @@
         let res = await this.$http({
           url:"goods",
           params:{
-            pagenum:this.pagenum,
+            pagenum:this.currentpage,
             pagesize:this.pagesize
           }
         })
@@ -79,12 +88,12 @@
         this.goodsData = res.data.data.goods
         this.total = res.data.data.total
       },
-      setCurrent(row) {
-        this.$refs.singleTable.setCurrentRow(row);
+      async currentChange(currentpage){
+        this.currentpage = currentpage;
+        this.getGoodsData()
+
       },
-      handleCurrentChange(val) {
-        this.currentRow = val;
-      }
+      
     }
  }
 </script>
